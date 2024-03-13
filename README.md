@@ -1,1 +1,2 @@
 # proteinTracker
+This project is a mobile app designed to help users track their daily protein intake in comparison to their target through a Nutrition API, written in Node.js and Python. A target protein intake is calculated based on the target weight that wants to be reached by the user and their current body fat percentage. Other nutritional values are also recorded such as calories, fat and sodium.
