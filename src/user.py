@@ -8,6 +8,8 @@ empty_list_length = 0
 # Create new user with unique email, strong password and other details (note weight is in kg)
 # Format: {userId: [{name: n}, {email: e}, {password: p}, {weight: w}, {target: 0}, {log: [{date: [f]}]}]}
 def create_user(name, email, password, current_weight):
+    data = data_store.get_data()
+    app_users = data["users"]
     # Check email has not been taken
     if get_user_info(email) != None:
         raise ValueError("Email has already been taken. Try another one")

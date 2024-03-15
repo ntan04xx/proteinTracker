@@ -18,15 +18,17 @@ class test_create_user(unittest.TestCase):
 class Test_login(unittest.TestCase):
     def test_wrong_password(self):
         user.create_user("Bob", "bobZaBest@gmail.com", "PaSSw0rd!", 100)
-        self.assertFalse(login("bobZaBest@gmail.com", "PaSSw0RD!"))
+        with self.assertRaises(ValueError):
+            user.login("bobZaBest@gmail.com", "PaSSw0RD!")
 
     def test_wrong_username(self):
         user.create_user("Bob", "bobZaBest@gmail.com", "PaSSw0rd!", 100)
-        self.assertFalse(login("bobzaBest@gmail.com", "PaSSw0rd!"))
+        with self.assertRaises(ValueError):
+            user.login("bobZABest@gmail.com", "PaSSw0rd!")
     
     def test_successful_login(self):
         user.create_user("Bob", "bobZaBest@gmail.com", "PaSSw0rd!", 100)
-        self.assertTrue(login("bobZaBest@gmail.com", "PaSSw0rd!"))
+        self.assertTrue(user.login("bobZaBest@gmail.com", "PaSSw0rd!"))
 
 if __name__ == '__main__':
     unittest.main()
