@@ -1,0 +1,1 @@
+console.log('Start for front-end') // Focus on backend for now
