@@ -1,6 +1,10 @@
 import unittest, user, data_store
 
 class test_create_user(unittest.TestCase):
+    def tearDown(self) -> None:
+        data_store.clean_data()
+        return super().tearDown()
+
     def test_weak_password(self):
         with self.assertRaises(ValueError):
             user.create_user("Bob", "bobZaBest@gmail.com", "password", 100)
@@ -15,7 +19,11 @@ class test_create_user(unittest.TestCase):
         with self.assertRaises(ValueError):
             user.create_user("Not Bob",  "bobZaBest@gmail.com", "PaSSw0rd!", 70)
 
-class Test_login(unittest.TestCase):
+class test_login(unittest.TestCase):
+    def tearDown(self) -> None:
+        data_store.clean_data()
+        return super().tearDown()
+
     def test_wrong_password(self):
         user.create_user("Bob", "bobZaBest@gmail.com", "PaSSw0rd!", 100)
         with self.assertRaises(ValueError):

@@ -21,19 +21,23 @@ def create_user(name, email, password, current_weight):
         
     # Creating new account
     new_ID = get_new_ID(app_users)
-    today_date = datetime.today().date()
+    today_date = str(datetime.today().date())
     new_user_info = {new_ID: [{"name": name}, {"email": email}, {"password": password}, {"weight": current_weight}, {"target": 0}, {"log": [{today_date: []}]}]}
-    data_store.set_data(new_user_info)
+    data_store.new_profile(new_user_info)
 
 
 # Helper function: Get user info
-def get_user_info(email):
+def get_user_info(detail):
     data = data_store.get_data()
     app_users = data["users"]
     for user in app_users:
-        user_email = user.values().get("email")
-        if user_email == email:
-            return user
+        user_details = list(user.values())[0]
+        user_detail = ""
+        for detail_dic in user_details:
+            if detail in detail_dic.values():
+                user_detail = list(detail_dic.values())[0]
+        if user_detail == detail:
+            return user_detail
     return None   
 
 # Helper function: Checks if passwork is strong (uppercase + lowercase, numbers, special characters, at least 8 characters)
@@ -44,23 +48,23 @@ def is_password_strong(password):
     if len(password) < min_password_length:
         password_failures.append("Password needs to be at least 8 characters")
 
-    if not re.search(password, "[a-z]+"):
+    if not re.search("[a-z]+", password):
         password_failures.append("Password needs at least one lowercase character")
 
-    if not re.search(password, "[A-Z]+"):
+    if not re.search("[A-Z]+", password):
         password_failures.append("Password needs at least one uppercase character")
 
-    if not re.search(password, "\d+"):
+    if not re.search("\d+", password):
         password_failures.append("Password needs at least one number")
 
-    if not re.search(password, "[!@#$%^&*()\-_=+\[\]{};:'\",.<>?]+"):
+    if not re.search("[!@#$%^&*()\-_=+\[\]{};:'\",.<>?]+", password):
         password_failures.append("Password needs at least one special character")
 
     return password_failures
 
 # Helper function: From existing database creates new user ID, starts from 1 and increments by 5
 def get_new_ID(user_info):
-    return 5 * len(user_info) - 4
+    return 5 * len(user_info) + 1
 
 # Logs the user in with input username (email) and password or returns error if either are incorrect
 def login(username, password):
@@ -82,7 +86,6 @@ def is_nonexistent_username(username):
 # Helper function: Checks that password for user account is correct
 # Username already checked to exist so do not need to worry
 def is_wrong_password(username, password):
-    user = get_user_info(username)
-    if password == user.values().get("password"):
+    if password == get_user_info(password) and username == get_user_info(username):
         return False
     return True
