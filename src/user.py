@@ -6,12 +6,12 @@ from datetime import datetime
 empty_list_length = 0
 
 # Create new user with unique email, strong password and other details (note weight is in kg)
-# Format: {userId: [{name: n}, {email: e}, {password: p}, {weight: w}, {target: 0}, {log: [{date: [f]}]}]}
+# Format: {userId: id, name: n, email: e, password: p, weight: w, target: 0, log: [{date: [f]}]}
 def create_user(name, email, password, current_weight):
     data = data_store.get_data()
     app_users = data["users"]
-    # Check email has not been taken
-    if get_user_info(email) != None:
+    # Check email has not been taken by another user already
+    if get_user(email) != None:
         raise ValueError("Email has already been taken. Try another one")
         
     # Check password is strong enough
@@ -22,22 +22,18 @@ def create_user(name, email, password, current_weight):
     # Creating new account
     new_ID = get_new_ID(app_users)
     today_date = str(datetime.today().date())
-    new_user_info = {new_ID: [{"name": name}, {"email": email}, {"password": password}, {"weight": current_weight}, {"target": 0}, {"log": [{today_date: []}]}]}
+    # Target weight is set to default 0 before calculations
+    new_user_info = {"userId": new_ID, "name": name, "email": email, "password": password, "weight": current_weight, "target": 0, "log": [{today_date: []}]}
     data_store.new_profile(new_user_info)
 
 
-# Helper function: Get user info
-def get_user_info(detail):
+# Helper function: Get user info from their email username
+def get_user(username):
     data = data_store.get_data()
     app_users = data["users"]
     for user in app_users:
-        user_details = list(user.values())[0]
-        user_detail = ""
-        for detail_dic in user_details:
-            if detail in detail_dic.values():
-                user_detail = list(detail_dic.values())[0]
-        if user_detail == detail:
-            return user_detail
+        if username == user.get("email"):
+            return user
     return None   
 
 # Helper function: Checks if passwork is strong (uppercase + lowercase, numbers, special characters, at least 8 characters)
@@ -79,13 +75,14 @@ def login(username, password):
 
 # Helper function: Goes through data.json to check if username exists
 def is_nonexistent_username(username):
-    if get_user_info(username) == None:
+    if get_user(username) == None:
         return True
     return False
 
 # Helper function: Checks that password for user account is correct
 # Username already checked to exist so do not need to worry
 def is_wrong_password(username, password):
-    if password == get_user_info(password) and username == get_user_info(username):
+    user = get_user(username) # Gets user details
+    if password == user.get("password"):
         return False
     return True

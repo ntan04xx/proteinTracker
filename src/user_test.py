@@ -14,6 +14,12 @@ class test_create_user(unittest.TestCase):
         user_info = data_store.get_data()["users"]
         self.assertTrue(len(user_info) == 1)
     
+    def test_multipple_users(self):
+        user.create_user("Bob", "bobZaBest@gmail.com", "PaSSw0rd!", 100)
+        user.create_user("Alice", "aliceIsThis@gmail.com", "pAssWoRD1!", 50)
+        user_info = data_store.get_data()["users"]
+        self.assertTrue(len(user_info) == 2)
+    
     def test_used_email(self):
         user.create_user("Bob", "bobZaBest@gmail.com", "PaSSw0rd!", 100)
         with self.assertRaises(ValueError):
