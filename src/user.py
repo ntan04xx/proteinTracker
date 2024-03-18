@@ -6,7 +6,7 @@ from datetime import datetime
 empty_list_length = 0
 
 # Create new user with unique email, strong password and other details (note weight is in kg)
-# Format: {userId: id, name: n, email: e, password: p, weight: w, target: 0, log: [{date: [f]}]}
+# Format: {userId: id, name: n, email: e, password: p, weight: w, target: 0, log: [{date: {macros}]}
 def create_user(name, email, password, current_weight):
     data = data_store.get_data()
     app_users = data["users"]
@@ -23,7 +23,15 @@ def create_user(name, email, password, current_weight):
     new_ID = get_new_ID(app_users)
     today_date = str(datetime.today().date())
     # Target weight is set to default 0 before calculations
-    new_user_info = {"userId": new_ID, "name": name, "email": email, "password": password, "weight": current_weight, "target": 0, "log": [{today_date: []}]}
+    new_user_info = {"userId": new_ID, 
+                     "name": name, 
+                     "email": email, 
+                     "password": password, 
+                     "weight": current_weight, 
+                     "target": 0, 
+                     "log": [{today_date: {"protein": (0,0),
+                                           "fat": (0,0),
+                                           "calories": (0,0)}}]}
     data_store.new_profile(new_user_info)
 
 
