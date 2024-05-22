@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nutrition API Response</title>
+</head>
+<body>
+    <h1>API Response</h1>
+    <p><strong>Ingredients:</strong> {{ input_data }}</p>
+    <p><strong>Nutrition Data:</strong> {{ output_data }}</p>
+    <a href="{% url 'api_request' %}">Make another request</a>
+</body>
+</html>
