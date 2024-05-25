@@ -48,6 +48,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "calorie_count.middleware.ValueErrorMiddleware",
 ]
 
 ROOT_URLCONF = "proteinTracker.urls"

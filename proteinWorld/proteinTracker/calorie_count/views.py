@@ -7,6 +7,9 @@ import json
 app_id = "61bf32f0"
 app_key = "786cd82f86f149854c26c1b43178825c"
 
+def value_error_view(request, exception):
+    return render(request, 'calorie_count/value_error.html', {'message': str(exception)})
+
 def call_api(input_food, input_amount):
     url = 'https://api.edamam.com/api/nutrition-details'
     params = {'app_id': app_id, 'app_key': app_key}
@@ -15,7 +18,7 @@ def call_api(input_food, input_amount):
     if response.status_code == 200:
         result = response.json()
     else:
-        raise ValueError("Food not found")
+        raise ValueError("Not found")
 
     food_nutrients = result.get("totalNutrients")
     protein = food_nutrients.get("PROCNT").get("quantity")
