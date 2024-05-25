@@ -4,10 +4,19 @@
     <title>Nutrition API Request</title>
 </head>
 <body>
-    <h1>Get Food Nutrition Values Here:</h1>
+    <h1>Get Food Nutrition Values Here (please only enter one at a time):</h1>
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+        Food Name:
+        <div>
+            {% csrf_token %}
+            {{ form.input_food }}
+        </div>
+
+        Food Amount (give in metric only):
+        <div>
+            {% csrf_token %}
+            {{ form.input_amount }}     
+        </div>   
         <button type="submit">Submit</button>
     </form>
 </body>
