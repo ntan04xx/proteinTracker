@@ -3,4 +3,5 @@ from . import views
 
 urlpatterns = [
     path('api_request/', views.api_request_view, name='api_request'),
+    path('', views.home_page, name = "home")
 ]

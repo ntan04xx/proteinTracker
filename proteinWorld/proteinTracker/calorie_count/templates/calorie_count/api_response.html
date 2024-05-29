@@ -1,7 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Nutrition API Response</title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
 </head>
 <body>
     <h1>API Response</h1>
@@ -9,6 +12,16 @@
     <p><strong>Amount:</strong> {{ input_amount }}</p>
     <p><strong>Nutrition Data:</strong> {{ nutrition_data }}</p>
     <p><strong>Current Totals:</strong> {{ totals_data }}</p>
-    <a href="{% url 'api_request' %}">Make another request</a>
+    <div>
+        <a href = "{% url 'api_request' %}">
+            <button> Make another request? </button>
+        </a>
+    </div>
+    &nbsp
+    <div>
+        <a href = "{% url 'home' %}">
+            <button> Return Home </button>
+        </a>
+    </div>
 </body>
 </html>

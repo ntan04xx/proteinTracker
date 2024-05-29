@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Protein Tracker: Your Everyday App for Easy Macro Maintenance </title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> Struggle with remembering your macros for each day? Have no worry with Protein Tracker Here! </h1>
+    <div>
+    <p> The app is very easy to operate: </p>
+    <ol>
+        <li> Click on the 'Calculate Macros' button to lead you to our Macro Calculator. </li>
+        <li> Enter the food name and amount you want to check and submit it. </li>
+        <li> Our calculator will give you both the food and your total macros. </li>
+        <li> For more items, just press 'Go back' and input any other foods! </li>
+    </ol>
+    </div>
+    <div>
+    <p> Disclaimer: All total records are wiped after you exit the session. </p>
+    </div>
+    <div>
+        <a href = "{% url 'api_request' %}">
+        <button> Calculate Macros! </button>
+        </a>
+    </div>
+    &nbsp
+    <div>
+        <a href = "{% url 'home' %}">
+        <button> Track Records! (not yet implemented) </button>
+        </a>
+    </div>
+</body>
+</html>

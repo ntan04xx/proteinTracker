@@ -7,6 +7,9 @@ import json
 app_id = "61bf32f0"
 app_key = "786cd82f86f149854c26c1b43178825c"
 
+def home_page(request):
+    return render(request, 'calorie_count/home.html')
+
 def value_error_view(request, exception):
     return render(request, 'calorie_count/value_error.html', {'message': str(exception)})
 

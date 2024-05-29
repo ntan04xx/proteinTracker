@@ -1,7 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Nutrition API Request</title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
 </head>
 <body>
     <h1>Get Food Nutrition Values Here (please only enter one at a time):</h1>
@@ -19,5 +22,10 @@
         </div>   
         <button type="submit">Submit</button>
     </form>
+    <div>
+        <a href = "{% url 'home' %}">
+            <button> Return Home </button>
+        </a>
+    </div>
 </body>
 </html>
