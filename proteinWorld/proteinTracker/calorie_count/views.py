@@ -68,3 +68,29 @@ def api_request_view(request):
     else:
         form = ApiRequestForm()
     return render(request, 'calorie_count/api_request.html', {'form': form})
+
+def find_targets(profile):
+    if profile.gender == 'M':
+        bmr = 88.362 + (13.397 * profile.weight) + (4.799 * profile.height) - (5.677 * profile.age)
+    else:
+        bmr = 447.593 + (9.247 * profile.weight) + (3.098 * profile.height) - (4.33 * profile.age)
+    
+    if profile.activity == 'None':
+        bmr *= 1.2
+    elif profile.activity == 'Low':
+        bmr *= 1.375
+    elif profile.activity == 'Medium':
+        bmr *= 1.55
+    elif profile.activity == 'High':
+        bmr *= 1.725
+
+    if profile.goal[0] == 'Cut':
+        calorie_target = bmr * (1 - profile.goal[1])
+        protein_target = calorie_target * 0.3 # based on https://www.bulk.com/uk/the-core/how-to-decide-your-own-macro-split/
+        fat_target = calorie_target * 0.3
+    elif profile.goal[0] == 'Bulk':
+        calorie_target = bmr * (1 + profile.goal[1])
+        protein_target = calorie_target * 0.25
+        fat_target= calorie_target * 0.25
+    
+    return (calorie_target, protein_target, fat_target)
