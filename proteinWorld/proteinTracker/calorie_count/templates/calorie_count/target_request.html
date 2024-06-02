@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nutrition Progress Checker</title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> Check Progress Here (please enter all details):</h1>
+    <form method="post">
+        Age (integer):
+        <div>
+            {% csrf_token %}
+            {{ form.age }}
+        </div>
+
+        Weight (in kg):
+        <div>
+            {% csrf_token %}
+            {{ form.weight }}     
+        </div>   
+
+        Height (in cm):
+        <div>
+            {% csrf_token %}
+            {{ form.height }}     
+        </div>   
+
+        Gender:
+        <div>
+            {% csrf_token %}
+            {{ form.gender }}     
+        </div>    
+
+        Activity:
+        <div>
+            {% csrf_token %}
+            {{ form.activity }}     
+        </div>  
+
+        Goal:
+        <div>
+            {% csrf_token %}
+            {{ form.goal }}     
+        </div>  
+        <button type="submit">Submit</button>
+    </form>
+    <div>
+        <a href = "{% url 'home' %}">
+            <button> Return Home </button>
+        </a>
+    </div>
+</body>
+</html>
