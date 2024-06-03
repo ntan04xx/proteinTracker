@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nutrition Progress Checker</title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1>Your Current Progress:</h1>
+    <p>{{ calories }}</p>
+    <p>{{ protein }}</p>
+    <p>{{ fat }}</p>
+    <div>
+        <a href = "{% url 'api_request' %}">
+            <button> Add Another Item? </button>
+        </a>
+    </div>
+    &nbsp
+    <div>
+        <a href = "{% url 'home' %}">
+            <button> Return Home </button>
+        </a>
+    </div>
+</body>
+</html>

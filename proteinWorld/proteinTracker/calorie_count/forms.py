@@ -13,7 +13,7 @@ class TargetRequestForm(forms.Form):
         ('M', 'Male'),
         ('F', 'Female')
     ]
-    gender = forms.ChoiceField(choice = GENDER, widget = forms.RadioSelect)
+    gender = forms.ChoiceField(choices = GENDER, widget = forms.RadioSelect)
 
     ACTIVITY = [
         ('None', '0 times per week'),
@@ -21,12 +21,12 @@ class TargetRequestForm(forms.Form):
         ('Medium', '3-4 times per week'),
         ('High', '>5 times per week')
     ]
-    activity = forms.ChoiceField(choice = ACTIVITY, widget = forms.RadioSelect)
+    activity = forms.ChoiceField(choices = ACTIVITY, widget = forms.RadioSelect)
 
     GOAL = [
-        ('Cut', 0.1)
-        ('Cut', 0.2),
-        ('Bulk', 0.1),
-        ('Bulk', 0.2)
+        ('Cut 0.2', 'Heavy Cut'),
+        ('Cut 0.1', 'Light Cut'),
+        ('Bulk 0.1', 'Light Bulk'),
+        ('Bulk 0.2', 'Heavy Bulk')
     ]
-    goal = forms.ChoiceField(choice = GOAL, widget = forms.RadioSelect)
+    goal = forms.ChoiceField(choices = GOAL, widget = forms.RadioSelect)

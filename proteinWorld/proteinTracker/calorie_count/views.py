@@ -1,6 +1,7 @@
 import requests
 from django.shortcuts import render, redirect
 from .forms import ApiRequestForm
+from .forms import TargetRequestForm
 from .models import ApiResponse
 import json
 
@@ -69,28 +70,75 @@ def api_request_view(request):
         form = ApiRequestForm()
     return render(request, 'calorie_count/api_request.html', {'form': form})
 
-def find_targets(profile):
-    if profile.gender == 'M':
-        bmr = 88.362 + (13.397 * profile.weight) + (4.799 * profile.height) - (5.677 * profile.age)
-    else:
-        bmr = 447.593 + (9.247 * profile.weight) + (3.098 * profile.height) - (4.33 * profile.age)
-    
-    if profile.activity == 'None':
-        bmr *= 1.2
-    elif profile.activity == 'Low':
-        bmr *= 1.375
-    elif profile.activity == 'Medium':
-        bmr *= 1.55
-    elif profile.activity == 'High':
-        bmr *= 1.725
+class Profile:
+    def __init__(self, age, weight, height, gender, activity, goal):
+        self.age = age
+        self.weight = weight
+        self.height = height
+        self.gender = gender
+        self.activity = activity
+        self.goal = goal
 
-    if profile.goal[0] == 'Cut':
-        calorie_target = bmr * (1 - profile.goal[1])
-        protein_target = calorie_target * 0.3 # based on https://www.bulk.com/uk/the-core/how-to-decide-your-own-macro-split/
-        fat_target = calorie_target * 0.3
-    elif profile.goal[0] == 'Bulk':
-        calorie_target = bmr * (1 + profile.goal[1])
-        protein_target = calorie_target * 0.25
-        fat_target= calorie_target * 0.25
-    
-    return (calorie_target, protein_target, fat_target)
+    def find_targets(self):
+        if self.gender == 'M':
+            bmr = 88.362 + (13.397 * self.weight) + (4.799 * self.height) - (5.677 * self.age)
+        else:
+            bmr = 447.593 + (9.247 * self.weight) + (3.098 * self.height) - (4.33 * self.age)
+        
+        if self.activity == 'None':
+            bmr *= 1.2
+        elif self.activity == 'Low':
+            bmr *= 1.375
+        elif self.activity == 'Medium':
+            bmr *= 1.55
+        elif self.activity == 'High':
+            bmr *= 1.725
+
+        goal = self.goal.split(" ")
+        style = goal[0]
+        percent = float(goal[1])
+
+        if style == 'Cut':
+            calorie_target = bmr * (1 - percent)
+            protein_target = calorie_target * 0.3 # based on https://www.bulk.com/uk/the-core/how-to-decide-your-own-macro-split/
+            fat_target = calorie_target * 0.3
+        elif style == 'Bulk':
+            calorie_target = bmr * (1 + percent)
+            protein_target = calorie_target * 0.25
+            fat_target= calorie_target * 0.25
+        
+        return (calorie_target, protein_target, fat_target)
+
+def get_target_strings(response, calorie_target, protein_target, fat_target):
+    calorie_diff = abs(response.total_calories - calorie_target)
+    calorie_msg = f"You have met today's calorie target by {calorie_diff}kJ" if response.total_calories else f"You still have {calorie_diff}kJ until you meet today's target."
+
+    protein_diff = abs(response.total_protein - protein_target)
+    protein_msg = f"You have met today's protein target by {protein_diff}kJ" if response.total_protein else f"You still have {protein_diff}kJ until you meet today's target."
+
+    fat_diff = abs(response.total_fat - fat_target)
+    fat_msg = f"You have met today's fat target by {fat_diff}kJ" if response.total_fat else f"You still have {fat_diff}kJ until you meet today's target."
+
+    return (calorie_msg, protein_msg, fat_msg)
+
+def target_request_view(request):
+    if request.method == 'POST':
+        form = TargetRequestForm(request.POST)
+        if form.is_valid():
+            age = form.cleaned_data['age']
+            weight = form.cleaned_data['weight']
+            height = form.cleaned_data['height']
+            gender = form.cleaned_data['gender']
+            activity = form.cleaned_data['activity']
+            goal = form.cleaned_data['goal']
+            profile = Profile(age, weight, height, gender, activity, goal)
+            calorie_target, protein_target, fat_target = profile.find_targets()
+
+            latest_response = ApiResponse.objects.latest('timestamp')
+            calorie_msg, protein_msg, fat_msg = get_target_strings(latest_response, calorie_target, protein_target, fat_target)
+            return render(request, 'calorie_count/target_response.html', {'calories': calorie_msg,
+                                                                          'protein': protein_msg,
+                                                                          'fat': fat_msg})
+    else:
+        form = TargetRequestForm()
+    return render(request, 'calorie_count/target_request.html', {'form': form})
