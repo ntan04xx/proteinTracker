@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from .forms import ApiRequestForm
 from .forms import TargetRequestForm
 from .models import ApiResponse
+import datetime
 import json
 
 app_id = "61bf32f0"
@@ -47,9 +48,17 @@ def api_request_view(request):
             # Store the data
             try:
                 latest_response = ApiResponse.objects.latest('timestamp')
-                total_protein = latest_response.total_protein + protein
-                total_calories = latest_response.total_calories + calories
-                total_fat = latest_response.total_fat + fat
+                latest_date = latest_response.timestamp.date()
+                current_date = datetime.datetime.now().date()
+
+                if latest_date == current_date:
+                    total_protein = latest_response.total_protein + protein
+                    total_calories = latest_response.total_calories + calories
+                    total_fat = latest_response.total_fat + fat
+                else:
+                    total_protein = protein
+                    total_calories = calories
+                    total_fat = fat
             except ApiResponse.DoesNotExist:
                 total_protein = protein
                 total_calories = calories
@@ -70,7 +79,7 @@ def api_request_view(request):
         form = ApiRequestForm()
     return render(request, 'calorie_count/api_request.html', {'form': form})
 
-class Profile:
+class UserProfile:
     def __init__(self, age, weight, height, gender, activity, goal):
         self.age = age
         self.weight = weight
@@ -131,8 +140,8 @@ def target_request_view(request):
             gender = form.cleaned_data['gender']
             activity = form.cleaned_data['activity']
             goal = form.cleaned_data['goal']
-            profile = Profile(age, weight, height, gender, activity, goal)
-            calorie_target, protein_target, fat_target = profile.find_targets()
+            user = UserProfile(age, weight, height, gender, activity, goal)
+            calorie_target, protein_target, fat_target = user.find_targets()
 
             latest_response = ApiResponse.objects.latest('timestamp')
             calorie_msg, protein_msg, fat_msg = get_target_strings(latest_response, calorie_target, protein_target, fat_target)
