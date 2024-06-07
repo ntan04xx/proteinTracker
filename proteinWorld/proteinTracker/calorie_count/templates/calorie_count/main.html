@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Protein Tracker: Your Everyday App for Easy Macro Maintenance </title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> Struggle with remembering your macros for each day? Have no worry with Protein Tracker Here! </h1>
+    <div>
+    <p> To find the nutrient breakdown of a food, just: </p>
+    <ol>
+        <li> Click on the 'Calculate Macros' button to lead you to our Macro Calculator. </li>
+        <li> Enter the food name and amount you want to check and submit it. </li>
+        <li> Our calculator will give you both the food and your total macros for the day. </li>
+        <li> For more items, just press 'Go back' and input any other foods! </li>
+    </ol>
+    <p> As for tracking your daily targets, just: </p>
+    <ol>
+        <li> Click on the 'Track Progress' button to lead you to our Progress Checker. </li>
+        <li> Enter your username and submit it. </li>
+        <li> Our checker will show which daily targets you have met and not met and by how much. </li>
+        <li> To add a food item, just press 'Add Item' and follow the above procedure! </li>
+    </ol>
+    </div>
+    <div>
+        <a href = "{% url 'api_request' %}">
+        <button> Calculate Macros! </button>
+        </a>
+    </div>
+    &nbsp
+    <div>
+        <a href = "{% url 'track_request' %}">
+        <button> Track Progress! </button>
+        </a>
+    </div>
+</body>
+</html>

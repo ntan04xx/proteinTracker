@@ -4,7 +4,9 @@ class ApiRequestForm(forms.Form):
     input_food = forms.CharField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")
     input_amount = forms.CharField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")
 
-class TargetRequestForm(forms.Form):
+class SignUpForm(forms.Form):
+    username = forms.CharField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")
+    password = forms.CharField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")
     age = forms.IntegerField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")
     height = forms.FloatField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")
     weight = forms.FloatField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")
@@ -30,3 +32,6 @@ class TargetRequestForm(forms.Form):
         ('Bulk 0.2', 'Heavy Bulk')
     ]
     goal = forms.ChoiceField(choices = GOAL, widget = forms.RadioSelect)
+
+class TargetRequestForm(forms.form):
+    username = forms.CharField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")

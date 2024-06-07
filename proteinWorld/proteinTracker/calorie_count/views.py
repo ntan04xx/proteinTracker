@@ -1,17 +1,20 @@
 import requests
 from django.shortcuts import render, redirect
-from .forms import ApiRequestForm
-from .forms import TargetRequestForm
-from .models import ApiResponse
+from .forms import ApiRequestForm, SignUpForm, TargetRequestForm
+from .models import ApiResponse, UserList
 from .user import UserProfile
 import datetime
 import json
+import re
 
 app_id = "61bf32f0"
 app_key = "786cd82f86f149854c26c1b43178825c"
 
 def home_page(request):
     return render(request, 'calorie_count/home.html')
+
+def main_page(request):
+    return render(request, 'calorie_count/main.html')
 
 def value_error_view(request, exception):
     return render(request, 'calorie_count/value_error.html', {'message': str(exception)})
@@ -92,24 +95,61 @@ def get_target_strings(response, calorie_target, protein_target, fat_target):
 
     return (calorie_msg, protein_msg, fat_msg)
 
-def target_request_view(request):
+def is_password_strong(password):
+    min_length = 8
+    if re.search("\d", password) == None or re.search("[~`!@#$%^&*()-_+={}[]|\;:\"<>,./?]", password) == None or len(password) < min_length:
+        return False
+    return True
+
+def sign_up_view(request):
     if request.method == 'POST':
-        form = TargetRequestForm(request.POST)
+        form = SignUpForm(request.POST)
         if form.is_valid():
+            username = form.cleaned_data['username']
+            if UserList.objects.filter(username = username).exists():
+                return render(request, 'calorie_count/used_username.html')
+            password = form.cleaned_data['password']
+            if is_password_strong(password) == False:
+                return render(request, 'calorie_count/weak_password.html')
+
             age = form.cleaned_data['age']
             weight = form.cleaned_data['weight']
             height = form.cleaned_data['height']
             gender = form.cleaned_data['gender']
             activity = form.cleaned_data['activity']
             goal = form.cleaned_data['goal']
+
             user = UserProfile(age, weight, height, gender, activity, goal)
             calorie_target, protein_target, fat_target = user.find_targets()
 
+            UserList.objects.create(username=username,
+                                    passsword=password,
+                                    age=age,
+                                    weight=weight,
+                                    height=height,
+                                    gender=gender,
+                                    activity=activity,
+                                    goal=goal,
+                                    calorie_target=calorie_target,
+                                    protein_target=protein_target,
+                                    fat_target=fat_target)
+            return render(request, 'calorie_count/main.html', {'form': form})
+        else:
+            form = SignUpForm()
+    return render(request, 'calorie_count/sign_up.html', {'form': form})
+
+def target_request_view(request):
+    if request.method == 'POST':
+        form = TargetRequestForm(request.POST)
+        if form.is_valid():
+            username = request.cleaned_data['username']
+            user_object = UserList.objects.filter(username = username).exists()
+            calorie_target, protein_target, fat_target = user_object.calorie_target, user_object.protein_target, user_object.fat_target
             latest_response = ApiResponse.objects.latest('timestamp')
             calorie_msg, protein_msg, fat_msg = get_target_strings(latest_response, calorie_target, protein_target, fat_target)
             return render(request, 'calorie_count/target_response.html', {'calories': calorie_msg,
-                                                                          'protein': protein_msg,
-                                                                          'fat': fat_msg})
-    else:
-        form = TargetRequestForm()
-    return render(request, 'calorie_count/target_request.html', {'form': form})
+                                                                            'protein': protein_msg,
+                                                                            'fat': fat_msg})
+        else:
+            form = TargetRequestForm()
+    return render(request, 'calorie_count/target_request.html')

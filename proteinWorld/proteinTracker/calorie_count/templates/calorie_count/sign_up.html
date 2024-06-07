@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nutrition Progress Checker</title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> Welcome! Make a new account here (please enter all details):</h1>
+    <form method="post">
+        Username:
+        <div>
+            {% csrf_token %}
+            {{ form.username }}
+        </div>
+
+        Password (at least 8 characters, must include one number and special character):
+        <div>
+            {% csrf_token %}
+            {{ form.password }}
+        </div>
+
+        <br> Age (integer):
+        <div>
+            {% csrf_token %}
+            {{ form.age }}
+        </div>
+
+        <br>Weight (in kg):
+        <div>
+            {% csrf_token %}
+            {{ form.weight }}     
+        </div>   
+
+        <br>Height (in cm):
+        <div>
+            {% csrf_token %}
+            {{ form.height }}     
+        </div>   
+
+        <br>Gender:
+        <div>
+            {% csrf_token %}
+            {{ form.gender }}     
+        </div>    
+
+        <br>Activity:
+        <div>
+            {% csrf_token %}
+            {{ form.activity }}     
+        </div>  
+
+        <br>Goal:
+        <div>
+            {% csrf_token %}
+            {{ form.goal }}     
+        </div>  
+        <button type="submit">Submit</button>
+    </form>
+    <div>
+        <a href = "{% url 'main' %}">
+            <button> Return Home </button>
+        </a>
+    </div>
+</body>
+</html>

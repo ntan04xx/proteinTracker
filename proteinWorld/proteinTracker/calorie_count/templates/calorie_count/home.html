@@ -7,36 +7,22 @@
     <link rel="stylesheet" href = "{% static 'css/home.css' %}">
 </head>
 <body>
-    <h1> Struggle with remembering your macros for each day? Have no worry with Protein Tracker Here! </h1>
-    <div>
-    <p> To find the nutrient breakdown of a food, just: </p>
-    <ol>
-        <li> Click on the 'Calculate Macros' button to lead you to our Macro Calculator. </li>
-        <li> Enter the food name and amount you want to check and submit it. </li>
-        <li> Our calculator will give you both the food and your total macros for the day. </li>
-        <li> For more items, just press 'Go back' and input any other foods! </li>
-    </ol>
-    <p> As for tracking your daily targets, just: </p>
-    <ol>
-        <li> Click on the 'Track Progress' button to lead you to our Progress Checker. </li>
-        <li> Enter the various requested details as accurate as possible and submit it. </li>
-        <li> Our checker will show which daily targets you have met and not met and by how much. </li>
-        <li> To add a food item, just press 'Add Item' and follow the above procedure! </li>
-    </ol>
-    </div>
+    <h1> Ready to begin a new life of convenience? </h1>
     <div>
     <p> Disclaimer: We acknowledge Edamam in the use of their API for our macro calculator.</p>
     </div>
     <div>
-        <a href = "{% url 'api_request' %}">
-        <button> Calculate Macros! </button>
+        <a href = "{% url 'home' %}">
+        <button> Log In </button>
         </a>
     </div>
-    &nbsp
     <div>
-        <a href = "{% url 'target_request' %}">
-        <button> Track Progress! </button>
+    <br> If you do not have an account:
+    <div>
+        <a href = "{% url 'sign_up' %}">
+        <button> Sign Up Here! </button>
         </a>
+    </div>
     </div>
 </body>
 </html>

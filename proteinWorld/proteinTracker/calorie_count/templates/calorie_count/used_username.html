@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Username Already Used! </title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> Someone has already used your username. </h1>
+    <p> Try inputting another username! </p>
+    <div>
+        <a href = "{% url 'sign_up' %}">
+        <button> Return </button>
+        </a>
+    </div>
+</body>
+</html>
