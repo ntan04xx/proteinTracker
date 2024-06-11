@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> Welcome Back! Log In Here:</h1>
+    <form method="post">
+        Username:
+        <div>
+            {% csrf_token %}
+            {{ form.username }}
+        </div>
+
+        Password:
+        <div>
+            {% csrf_token %}
+            {{ form.password }}
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+    <div>
+        <a href = "{% url 'main' %}">
+            <button> Return Home </button>
+        </a>
+    </div>
+
+    <div>
+        <a href = "{% url 'sign_up' %}">
+            <button> Don't have an account? </button>
+        </a>
+    </div>
+</body>
+</html>

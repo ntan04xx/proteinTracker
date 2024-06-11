@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logout</title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> You have been successfully logged out. </h1>
+    <div>
+        <a href = "{% url 'login' %}">
+            <button> Login Again? </button>
+        </a>
+    </div>
+
+    <div>
+        <a href = "{% url 'sign_up' %}">
+            <button> Make An Account? </button>
+        </a>
+    </div>
+</body>
+</html>

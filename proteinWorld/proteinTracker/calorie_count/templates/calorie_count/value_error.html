@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Food or Amount Not Found</title>
+    <title>Value Error</title>
 </head>
 <body>
-    <h1>{{ message }}</h1>
+    <h1>Food or Amount Not Found</h1>
     <p> Make sure to put amount in metric (g, kg, etc) or try a more commonly known food </p>
-    <a href="{% url 'api_request' %}"> Try Again? </a>
+    <div>
+        <a href = "{% url 'api_request' %}">
+        <button> Try Again? </button>
+        </a>
+    </div>
 </body>
 </html>

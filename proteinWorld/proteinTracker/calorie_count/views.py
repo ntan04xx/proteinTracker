@@ -1,7 +1,11 @@
 import requests
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from .forms import ApiRequestForm, SignUpForm, TargetRequestForm
-from .models import ApiResponse, UserList
+from .models import ApiResponse, UserDetails
 from .user import UserProfile
 import datetime
 import json
@@ -13,11 +17,9 @@ app_key = "786cd82f86f149854c26c1b43178825c"
 def home_page(request):
     return render(request, 'calorie_count/home.html')
 
+@login_required
 def main_page(request):
     return render(request, 'calorie_count/main.html')
-
-def value_error_view(request, exception):
-    return render(request, 'calorie_count/value_error.html', {'message': str(exception)})
 
 def call_api(input_food, input_amount):
     url = 'https://api.edamam.com/api/nutrition-details'
@@ -27,7 +29,7 @@ def call_api(input_food, input_amount):
     if response.status_code == 200:
         result = response.json()
     else:
-        raise ValueError("Not found")
+        return redirect('value_error')
 
     food_nutrients = result.get("totalNutrients")
     protein = food_nutrients.get("PROCNT").get("quantity")
@@ -42,6 +44,7 @@ def call_api(input_food, input_amount):
 
     return calories, fat, protein, json.dumps(macros)
 
+@login_required
 def api_request_view(request):
     if request.method == 'POST':
         form = ApiRequestForm(request.POST)
@@ -106,11 +109,11 @@ def sign_up_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
-            if UserList.objects.filter(username = username).exists():
-                return render(request, 'calorie_count/used_username.html')
+            if UserDetails.objects.filter(username = username).exists():
+                return redirect('used_username')
             password = form.cleaned_data['password']
             if is_password_strong(password) == False:
-                return render(request, 'calorie_count/weak_password.html')
+                return redirect('weak_password')
 
             age = form.cleaned_data['age']
             weight = form.cleaned_data['weight']
@@ -119,11 +122,12 @@ def sign_up_view(request):
             activity = form.cleaned_data['activity']
             goal = form.cleaned_data['goal']
 
-            user = UserProfile(age, weight, height, gender, activity, goal)
-            calorie_target, protein_target, fat_target = user.find_targets()
+            userProfile = UserProfile(age, weight, height, gender, activity, goal)
+            calorie_target, protein_target, fat_target = userProfile.find_targets()
 
-            UserList.objects.create(username=username,
-                                    passsword=password,
+            User.objects.create_user(username = username, password = password)
+            UserDetails.objects.create(
+                                    username=username,
                                     age=age,
                                     weight=weight,
                                     height=height,
@@ -133,17 +137,21 @@ def sign_up_view(request):
                                     calorie_target=calorie_target,
                                     protein_target=protein_target,
                                     fat_target=fat_target)
-            return render(request, 'calorie_count/main.html', {'form': form})
+            user = authenticate(username = username, password = password)
+            if user is not None:
+                login(user)
+                return redirect('main')
         else:
             form = SignUpForm()
     return render(request, 'calorie_count/sign_up.html', {'form': form})
 
+@login_required
 def target_request_view(request):
     if request.method == 'POST':
         form = TargetRequestForm(request.POST)
         if form.is_valid():
             username = request.cleaned_data['username']
-            user_object = UserList.objects.filter(username = username).exists()
+            user_object = UserDetails.objects.filter(username = username).exists()
             calorie_target, protein_target, fat_target = user_object.calorie_target, user_object.protein_target, user_object.fat_target
             latest_response = ApiResponse.objects.latest('timestamp')
             calorie_msg, protein_msg, fat_msg = get_target_strings(latest_response, calorie_target, protein_target, fat_target)
@@ -153,3 +161,24 @@ def target_request_view(request):
         else:
             form = TargetRequestForm()
     return render(request, 'calorie_count/target_request.html')
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request.POST)
+        if form.is_valid():
+            username = request.cleaned_data['username']
+            password = request.cleaned_data['password']
+            user = authenticate(username = username, password = password)
+            if user is not None:
+                login(user)
+                return redirect('main')
+            else:
+                return redirect('wrong_login')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'calorie_count/login.html')
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return render(request, 'calorie_count/logout.html')

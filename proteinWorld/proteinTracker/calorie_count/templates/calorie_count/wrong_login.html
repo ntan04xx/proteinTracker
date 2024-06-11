@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Wrong Username or Password </title>
+    <link rel="icon" type="image/x-icon" href = "{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href = "{% static 'css/home.css' %}">
+</head>
+<body>
+    <h1> Login Failed! </h1>
+    <p> Ensure that you have entered the correct username or password. </p>
+    <div>
+        <a href = "{% url 'login' %}">
+        <button> Return </button>
+        </a>
+    </div>
+</body>
+</html>

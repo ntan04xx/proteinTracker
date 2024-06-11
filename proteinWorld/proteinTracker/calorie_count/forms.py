@@ -33,5 +33,5 @@ class SignUpForm(forms.Form):
     ]
     goal = forms.ChoiceField(choices = GOAL, widget = forms.RadioSelect)
 
-class TargetRequestForm(forms.form):
+class TargetRequestForm(forms.Form):
     username = forms.CharField(widget = forms.Textarea(attrs = {'placeholder': 'Enter Data Here '}), label = "")

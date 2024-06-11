@@ -5,6 +5,8 @@ urlpatterns = [
     path('api_request/', views.api_request_view, name='api_request'),
     path('', views.home_page, name = "home"),
     path('sign_up/', views.sign_up_view, name = "sign_up"),
+    path('login/', views.login_view, name = "login"),
+    path('logout/', views.logout_view, name = "logout"),
     path('main/', views.main_page, name = "main"),
     path('target_request/', views.target_request_view, name = "target_request")
 ]

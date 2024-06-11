@@ -9,9 +9,8 @@ class ApiResponse(models.Model):
     total_fat = models.IntegerField(default = 0)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-class UserList(models.Model):
+class UserDetails(models.Model):
     username = models.TextField()
-    password = models.TextField()
     age = models.IntegerField(default = 21)
     weight = models.FloatField(default = 69.5)
     height = models.FloatField(default = 185)
