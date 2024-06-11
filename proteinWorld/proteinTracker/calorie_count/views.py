@@ -91,10 +91,10 @@ def get_target_strings(response, calorie_target, protein_target, fat_target):
     calorie_msg = f"You have met today's calorie target by {calorie_diff}kJ" if response.total_calories else f"You still have {calorie_diff}kJ until you meet today's target."
 
     protein_diff = abs(response.total_protein - protein_target)
-    protein_msg = f"You have met today's protein target by {protein_diff}kJ" if response.total_protein else f"You still have {protein_diff}kJ until you meet today's target."
+    protein_msg = f"You have met today's protein target by {protein_diff}g" if response.total_protein else f"You still have {protein_diff}g until you meet today's target."
 
     fat_diff = abs(response.total_fat - fat_target)
-    fat_msg = f"You have met today's fat target by {fat_diff}kJ" if response.total_fat else f"You still have {fat_diff}kJ until you meet today's target."
+    fat_msg = f"You have met today's fat target by {fat_diff}g" if response.total_fat else f"You still have {fat_diff}g until you meet today's target."
 
     return (calorie_msg, protein_msg, fat_msg)
 
