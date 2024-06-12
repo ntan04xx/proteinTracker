@@ -9,22 +9,12 @@
 <body>
     <h1> Welcome Back! Log In Here:</h1>
     <form method="post">
-        Username:
-        <div>
-            {% csrf_token %}
-            {{ form.username }}
-        </div>
-
-        Password:
-        <div>
-            {% csrf_token %}
-            {{ form.password }}
-        </div>
-
+        {% csrf_token %}
+        {{ form.as_p }}
         <button type="submit">Submit</button>
     </form>
     <div>
-        <a href = "{% url 'main' %}">
+        <a href = "{% url 'home' %}">
             <button> Return Home </button>
         </a>
     </div>

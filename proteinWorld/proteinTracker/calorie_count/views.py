@@ -110,10 +110,10 @@ def sign_up_view(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             if UserDetails.objects.filter(username = username).exists():
-                return redirect('used_username')
+                return render(request, 'calorie_count/used_username.html')
             password = form.cleaned_data['password']
             if is_password_strong(password) == False:
-                return redirect('weak_password')
+                return render(request, 'calorie_count/weak_password.html')
 
             age = form.cleaned_data['age']
             weight = form.cleaned_data['weight']
@@ -139,10 +139,10 @@ def sign_up_view(request):
                                     fat_target=fat_target)
             user = authenticate(username = username, password = password)
             if user is not None:
-                login(user)
-                return redirect('main')
-        else:
-            form = SignUpForm()
+                login(request, user)
+                return render(request, 'calorie_count/main.html')
+    else:
+        form = SignUpForm()
     return render(request, 'calorie_count/sign_up.html', {'form': form})
 
 @login_required
@@ -160,23 +160,21 @@ def target_request_view(request):
                                                                             'fat': fat_msg})
         else:
             form = TargetRequestForm()
-    return render(request, 'calorie_count/target_request.html')
+    return render(request, 'calorie_count/target_request.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request.POST)
         if form.is_valid():
-            username = request.cleaned_data['username']
-            password = request.cleaned_data['password']
+            username = request.cleaned_data.get('username')
+            password = request.cleaned_data.get('password')
             user = authenticate(username = username, password = password)
             if user is not None:
-                login(user)
-                return redirect('main')
-            else:
-                return redirect('wrong_login')
+                login(request, user)
+                return render(request, 'calorie_count/main.html')
     else:
         form = AuthenticationForm()
-    return render(request, 'calorie_count/login.html')
+    return render(request, 'calorie_count/login.html', {'form': form})
 
 @login_required
 def logout_view(request):
