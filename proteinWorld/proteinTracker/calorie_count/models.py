@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class ApiResponse(models.Model):
@@ -10,7 +11,7 @@ class ApiResponse(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class UserDetails(models.Model):
-    username = models.TextField()
+    user = models.OneToOneField(User, on_delete = models.CASCADE, unique = True)
     age = models.IntegerField(default = 21)
     weight = models.FloatField(default = 69.5)
     height = models.FloatField(default = 185)
@@ -21,4 +22,7 @@ class UserDetails(models.Model):
     protein_target = models.FloatField(default=0)
     fat_target = models.FloatField(default=0)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
 

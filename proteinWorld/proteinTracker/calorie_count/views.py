@@ -1,10 +1,10 @@
 import requests
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import ApiRequestForm, SignUpForm, TargetRequestForm
+from .forms import ApiRequestForm, SignUpForm, TargetRequestForm, LoginForm
 from .models import ApiResponse, UserDetails
 from .user import UserProfile
 import datetime
@@ -44,6 +44,20 @@ def call_api(input_food, input_amount):
 
     return calories, fat, protein, json.dumps(macros)
 
+def get_total_macros(obj, protein, calories, fat):
+    latest_date = obj.timestamp.date()
+    current_date = datetime.datetime.now().date()
+
+    if latest_date == current_date:
+        total_protein = obj.total_protein + protein
+        total_calories = obj.total_calories + calories
+        total_fat = obj.total_fat + fat
+    else:
+        total_protein = protein
+        total_calories = calories
+        total_fat = fat
+    return total_protein, total_calories, total_fat
+
 @login_required
 def api_request_view(request):
     if request.method == 'POST':
@@ -55,17 +69,7 @@ def api_request_view(request):
             # Store the data
             try:
                 latest_response = ApiResponse.objects.latest('timestamp')
-                latest_date = latest_response.timestamp.date()
-                current_date = datetime.datetime.now().date()
-
-                if latest_date == current_date:
-                    total_protein = latest_response.total_protein + protein
-                    total_calories = latest_response.total_calories + calories
-                    total_fat = latest_response.total_fat + fat
-                else:
-                    total_protein = protein
-                    total_calories = calories
-                    total_fat = fat
+                total_protein, total_calories, total_fat = get_total_macros(latest_response, protein, calories, fat)
             except ApiResponse.DoesNotExist:
                 total_protein = protein
                 total_calories = calories
@@ -88,19 +92,25 @@ def api_request_view(request):
 
 def get_target_strings(response, calorie_target, protein_target, fat_target):
     calorie_diff = abs(response.total_calories - calorie_target)
-    calorie_msg = f"You have met today's calorie target by {calorie_diff}kJ" if response.total_calories else f"You still have {calorie_diff}kJ until you meet today's target."
+    calorie_msg = f"You have met today's calories target by {calorie_diff}kJ" if calorie_diff > 0 else f"You still have {calorie_diff}kJ until you meet today's target."
 
     protein_diff = abs(response.total_protein - protein_target)
-    protein_msg = f"You have met today's protein target by {protein_diff}g" if response.total_protein else f"You still have {protein_diff}g until you meet today's target."
+    protein_msg = f"You have met today's protein target by {protein_diff}g" if protein_diff > 0 else f"You still have {protein_diff}g until you meet today's target."
 
     fat_diff = abs(response.total_fat - fat_target)
-    fat_msg = f"You have met today's fat target by {fat_diff}g" if response.total_fat else f"You still have {fat_diff}g until you meet today's target."
+    fat_msg = f"You have met today's fat target by {fat_diff}g" if fat_diff > 0 else f"You still have {fat_diff}g until you meet today's target."
 
+    return (calorie_msg, protein_msg, fat_msg)
+
+def get_target_strings_initial(calorie_target, protein_target, fat_target):
+    calorie_msg = f"You still have {calorie_target}kJ until you meet today's target."
+    protein_msg = f"You still have {protein_target}g until you meet today's target."
+    fat_msg = f"You still have {fat_target}g until you meet today's target."
     return (calorie_msg, protein_msg, fat_msg)
 
 def is_password_strong(password):
     min_length = 8
-    if re.search("\d", password) == None or re.search("[~`!@#$%^&*()-_+={}[]|\;:\"<>,./?]", password) == None or len(password) < min_length:
+    if re.search("\d", password) == None or re.search("[~`!@#$%^&*()-_+=\{\}[]|\;:\"<>,./?]", password) == None or len(password) < min_length:
         return False
     return True
 
@@ -109,7 +119,7 @@ def sign_up_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
-            if UserDetails.objects.filter(username = username).exists():
+            if UserDetails.objects.filter(user__username = username).exists():
                 return render(request, 'calorie_count/used_username.html')
             password = form.cleaned_data['password']
             if is_password_strong(password) == False:
@@ -124,23 +134,20 @@ def sign_up_view(request):
 
             userProfile = UserProfile(age, weight, height, gender, activity, goal)
             calorie_target, protein_target, fat_target = userProfile.find_targets()
-
-            User.objects.create_user(username = username, password = password)
+            user = form.save()
             UserDetails.objects.create(
-                                    username=username,
-                                    age=age,
-                                    weight=weight,
-                                    height=height,
-                                    gender=gender,
-                                    activity=activity,
-                                    goal=goal,
-                                    calorie_target=calorie_target,
-                                    protein_target=protein_target,
-                                    fat_target=fat_target)
-            user = authenticate(username = username, password = password)
-            if user is not None:
-                login(request, user)
-                return render(request, 'calorie_count/main.html')
+                        user=user,
+                        age=age,
+                        weight=weight,
+                        height=height,
+                        gender=gender,
+                        activity=activity,
+                        goal=goal,
+                        calorie_target=calorie_target,
+                        protein_target=protein_target,
+                        fat_target=fat_target)
+            login(request, user)
+            return render(request, 'calorie_count/main.html')
     else:
         form = SignUpForm()
     return render(request, 'calorie_count/sign_up.html', {'form': form})
@@ -150,30 +157,33 @@ def target_request_view(request):
     if request.method == 'POST':
         form = TargetRequestForm(request.POST)
         if form.is_valid():
-            username = request.cleaned_data['username']
-            user_object = UserDetails.objects.filter(username = username).exists()
+            username = form.cleaned_data['username']
+            user_object = get_object_or_404(UserDetails, user__username = username)
             calorie_target, protein_target, fat_target = user_object.calorie_target, user_object.protein_target, user_object.fat_target
-            latest_response = ApiResponse.objects.latest('timestamp')
-            calorie_msg, protein_msg, fat_msg = get_target_strings(latest_response, calorie_target, protein_target, fat_target)
+            try:
+                latest_response = ApiResponse.objects.latest('timestamp')
+                calorie_msg, protein_msg, fat_msg = get_target_strings(latest_response, calorie_target, protein_target, fat_target)
+            except ApiResponse.DoesNotExist:
+                calorie_msg, protein_msg, fat_msg = get_target_strings_initial(calorie_target, protein_target, fat_target)
             return render(request, 'calorie_count/target_response.html', {'calories': calorie_msg,
                                                                             'protein': protein_msg,
                                                                             'fat': fat_msg})
-        else:
-            form = TargetRequestForm()
+    else:
+        form = TargetRequestForm()
     return render(request, 'calorie_count/target_request.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request.POST)
+        form = LoginForm(request.POST)
         if form.is_valid():
-            username = request.cleaned_data.get('username')
-            password = request.cleaned_data.get('password')
-            user = authenticate(username = username, password = password)
-            if user is not None:
-                login(request, user)
-                return render(request, 'calorie_count/main.html')
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            get_object_or_404(UserDetails, user__username = username, user__password = password)
+            return render(request, 'calorie_count/main.html')
+        else:
+            print(UserDetails.objects.latest('timestamp').user.password)
     else:
-        form = AuthenticationForm()
+        form = LoginForm()
     return render(request, 'calorie_count/login.html', {'form': form})
 
 @login_required

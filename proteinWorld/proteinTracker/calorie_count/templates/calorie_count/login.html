@@ -9,8 +9,17 @@
 <body>
     <h1> Welcome Back! Log In Here:</h1>
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+        Username:
+        <div>
+            {% csrf_token %}
+            {{ form.username }}
+        </div>
+
+        Password:
+        <div>
+            {% csrf_token %}
+            {{ form.password }}
+        </div>
         <button type="submit">Submit</button>
     </form>
     <div>
