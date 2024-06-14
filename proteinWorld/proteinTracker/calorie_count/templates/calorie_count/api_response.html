@@ -12,6 +12,20 @@
     <p><strong>Amount:</strong> {{ input_amount }}</p>
     <p><strong>Nutrition Data:</strong> {{ nutrition_data }}</p>
     <p><strong>Current Totals:</strong> {{ totals_data }}</p>
+    
+    <br>
+    {% if meets_protein %}
+        <p> Congratulations! You just passed your protein goal! </p>
+    {% endif %}
+
+    {% if meets_calorie %}
+        <p> Congratulations! You just passed your calories goal! </p>
+    {% endif %}
+
+    {% if meets_fat %}
+        <p> Congratulations! You just passed your fat goal! </p>
+    {% endif %}
+
     <div>
         <a href = "{% url 'api_request' %}">
             <button> Make another request? </button>

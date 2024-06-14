@@ -9,6 +9,12 @@
 <body>
     <h1>Get Food Nutrition Values Here (please only enter one at a time):</h1>
     <form method="post">
+        Username:
+        <div>
+            {% csrf_token %}
+            {{ form.username }}
+        </div>
+
         Food Name:
         <div>
             {% csrf_token %}

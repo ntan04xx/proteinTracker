@@ -66,26 +66,39 @@ def api_request_view(request):
             input_food = form.cleaned_data['input_food']
             input_amount = form.cleaned_data['input_amount']
             calories, fat, protein, api_response = call_api(input_food, input_amount)
+            username = form.cleaned_data['username']
+            user = get_object_or_404(UserDetails, user__username = username)
+            calorie_target, protein_target, fat_target = user.calorie_target, user.protein_target, user.fat_target
             # Store the data
             try:
                 latest_response = ApiResponse.objects.latest('timestamp')
                 total_protein, total_calories, total_fat = get_total_macros(latest_response, protein, calories, fat)
+                meets_protein = True if latest_response.total_protein < protein_target and total_protein >= protein_target else False
+                meets_calorie = True if latest_response.total_calories < calorie_target and total_calories >= calorie_target else False
+                meets_fat = True if latest_response.total_fat < fat_target and total_fat >= fat_target else False
             except ApiResponse.DoesNotExist:
                 total_protein = protein
                 total_calories = calories
                 total_fat = fat
+                meets_protein = True if total_protein >= protein_target else False
+                meets_calorie = True if total_calories >= calorie_target else False
+                meets_fat = True if total_fat >= fat_target else False
             ApiResponse.objects.create(input_data=f"Food: {input_food}, Amount: {input_amount}", 
                                        output_data=api_response,
                                        total_protein=total_protein,
                                        total_calories=total_calories,
-                                       total_fat=total_fat)
+                                       total_fat=total_fat
+                                       )
 
             # Redirect to a new URL with the output displayed
             total_nutrients = {'Calories (kcal)': total_calories, 'Fat (g)': total_fat, 'Protein (g)': total_protein}
             return render(request, 'calorie_count/api_response.html', {'input_food': input_food, 
                                                                        'input_amount': input_amount, 
                                                                        'nutrition_data': api_response,
-                                                                       'totals_data': total_nutrients})
+                                                                       'totals_data': total_nutrients,
+                                                                       'meets_protein': meets_protein,
+                                                                       'meets_calorie': meets_calorie,
+                                                                        'meets_fat': meets_fat})
     else:
         form = ApiRequestForm()
     return render(request, 'calorie_count/api_request.html', {'form': form})
