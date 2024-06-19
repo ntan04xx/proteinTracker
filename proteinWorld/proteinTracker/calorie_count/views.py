@@ -1,4 +1,5 @@
 import requests
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout, login
@@ -11,9 +12,6 @@ import datetime
 import json
 import re
 
-app_id = "61bf32f0"
-app_key = "786cd82f86f149854c26c1b43178825c"
-
 def home_page(request):
     return render(request, 'calorie_count/home.html')
 
@@ -23,7 +21,7 @@ def main_page(request):
 
 def call_api(input_food, input_amount):
     url = 'https://api.edamam.com/api/nutrition-details'
-    params = {'app_id': app_id, 'app_key': app_key}
+    params = {'app_id': settings.NUTRIAPI_ID, 'app_key': settings.NUTRIAPI_KEY}
     payload = {'ingr': [f"{input_food} {input_amount}"]}
     response = requests.post(url, params=params, json=payload)
     if response.status_code == 200:

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+# Retrieve api id and key
+NUTRIAPI_ID = config('NUTRIAPI_ID', default = '')
+NUTRIAPI_KEY = config('NUTRIAPI_KEY', default = '')
 
 # Application definition
 
